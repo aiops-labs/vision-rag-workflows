@@ -2,99 +2,32 @@ import { Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { cohereService } from '../services/cohereService';
 import { pineconeService } from '../services/pineconeService';
-import { EmbedRequest, EmbedResponse, ApiResponse } from '../types';
+import { EmbedResponse, ApiResponse, InternalServerError } from '../types';
 
 export class EmbedController {
-  /**
-   * Embed text and store in Pinecone
-   */
-  async embedText(req: Request, res: Response): Promise<void> {
-    const { text, namespace, metadata } = req.body as EmbedRequest;
-
-    try {
-      // Generate embedding using Cohere
-      const embedding = await cohereService.generateEmbedding(text);
-
-      // Create unique ID for the vector
-      const vectorId = uuidv4();
-
-      // Store in Pinecone
-      await pineconeService.upsertVectors(
-        [
-          {
-            id: vectorId,
-            values: embedding,
-            metadata: {
-              text,
-              ...metadata,
-              createdAt: new Date().toISOString(),
-            },
-          },
-        ],
-        namespace
-      );
-
-      const response: ApiResponse<EmbedResponse> = {
-        success: true,
-        data: {
-          id: vectorId,
-          namespace,
-          vector: embedding,
-          metadata: {
-            text,
-            ...metadata,
-            createdAt: new Date().toISOString(),
-          },
-        },
-        message: 'Text embedded and stored successfully',
-      };
-
-      res.status(201).json(response);
-    } catch (error) {
-      console.error('Embed error:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Failed to embed and store text',
-      });
-    }
-  }
-
-  /**
-   * Embed multiple texts in batch
-   */
   async embedBatch(req: Request, res: Response): Promise<void> {
-    const { texts, namespace, metadata } = req.body as {
-      texts: string[];
-      namespace: string;
-      metadata?: Record<string, any>;
-    };
-
+    const { image_urls, namespace } = req.body;
     try {
-      if (!Array.isArray(texts) || texts.length === 0) {
+      if (!Array.isArray(image_urls) || image_urls.length === 0) {
         res.status(400).json({
           success: false,
-          error: 'Texts array is required and must not be empty',
+          error: 'image_urls array is required and must not be empty',
         });
         return;
       }
-
-      // Generate embeddings for all texts
-      const embeddings = await cohereService.generateEmbeddings(texts);
-
-      // Prepare vectors for Pinecone
-      const vectors = texts.map((text, index) => ({
+      // For batch, call generateEmbeddingsFromUrl for each image URL
+      const cohereResponses = await Promise.all(image_urls.map((url: string) => cohereService.generateEmbeddingsFromUrl(url)));
+      const vectors = image_urls.map((image_url, index) => ({
         id: uuidv4(),
-        values: embeddings[index]!,
+        values: cohereResponses[index].embeddings.float[0],
         metadata: {
-          text,
-          ...metadata,
+          image_url,
+          // ...metadata,
           createdAt: new Date().toISOString(),
         },
+        cohere: cohereResponses[index]
       }));
-
-      // Store in Pinecone
-      await pineconeService.upsertVectors(vectors, namespace);
-
+      await pineconeService.upsertVectors(vectors.map(v => ({ id: v.id, values: v.values, metadata: v.metadata })), namespace);
       const response: ApiResponse<EmbedResponse[]> = {
         success: true,
         data: vectors.map((vector) => ({
@@ -102,16 +35,69 @@ export class EmbedController {
           namespace,
           vector: vector.values,
           metadata: vector.metadata,
+          cohere: vector.cohere
         })),
-        message: `Successfully embedded and stored ${vectors.length} texts`,
+        message: `Successfully embedded and stored ${vectors.length} image URLs`,
       };
-
       res.status(201).json(response);
     } catch (error) {
-      console.error('Batch embed error:', error);
       res.status(500).json({
         success: false,
-        error: 'Failed to embed and store texts in batch',
+        error: 'Failed to embed and store image URLs in batch',
+      });
+    }
+  }
+
+  async embedImage(req: Request, res: Response): Promise<void> {
+    const { imageUrl, namespace = "test" } = req.body;
+    try {
+      const  cohereResp = await cohereService.generateEmbeddingsFromUrl(imageUrl);
+      console.log(cohereResp, "cohere response")
+
+      const vectorId = uuidv4();
+      console.log("Pinecone processing")
+      const raw = cohereResp.embeddings;
+
+      // Some Cohere SDKs have extra nesting in `float.float`, so normalize it:
+      const embeddingVector = Array.isArray(raw.float)
+        ? raw.float
+        : Array.isArray(raw.float?.float)
+          ? raw.float.float
+          : [];
+
+      if (!embeddingVector.length || !Array.isArray(embeddingVector[0])) {
+        throw new InternalServerError('Malformed embedding vector returned by Cohere');
+      }
+      await pineconeService.upsertVectors([
+        {
+          id: vectorId,
+          values: embeddingVector,
+          metadata: {
+            image_url: imageUrl,
+            createdAt: new Date().toISOString(),
+          },
+        },
+      ], namespace);
+      const response: ApiResponse<EmbedResponse> = {
+        success: true,
+        data: {
+          id: vectorId,
+          namespace,
+          vector: cohereResp.embeddings.float[0],
+          metadata: {
+            image_url: imageUrl,
+            createdAt: new Date().toISOString(),
+          },
+          cohere: cohereResp
+        },
+        message: 'Image embedded and stored successfully',
+      };
+      res.status(201).json(response);
+    } catch (error) {
+      
+      res.status(500).json({
+        success: false,
+        error: 'Failed to embed and store image',
       });
     }
   }

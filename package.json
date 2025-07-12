@@ -24,14 +24,16 @@
   "dependencies": {
     "@pinecone-database/pinecone": "^6.0.0",
     "@types/uuid": "^10.0.0",
-    "cohere-ai": "^6.2.2",
+    "cohere-ai": "^7.17.1",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "express-rate-limit": "^7.1.5",
     "helmet": "^7.1.0",
+    "mime-types": "^3.0.1",
     "morgan": "^1.10.0",
+    "sharp": "^0.34.3",
     "uuid": "^11.1.0",
     "zod": "^3.22.4"
   },

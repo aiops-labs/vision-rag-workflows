@@ -43,6 +43,7 @@ export interface EmbedResponse {
   namespace: string;
   vector: number[];
   metadata?: Record<string, any>;
+  cohere?: any;
 }
 
 export interface SearchResult {

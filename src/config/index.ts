@@ -38,7 +38,7 @@ export const appConfig = {
   },
   cohere: {
     apiKey: config.COHERE_API_KEY,
-    model: 'embed-english-v3.0', // Cohere Embed v4 equivalent
+    model: 'embed-v4.0', // Cohere Embed v4 equivalent
   },
   pinecone: {
     apiKey: config.PINECONE_API_KEY,

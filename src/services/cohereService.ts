@@ -1,59 +1,76 @@
-import cohere from 'cohere-ai';
+import { CohereClientV2 } from 'cohere-ai';
 import { appConfig } from '../config';
 import { AppError, InternalServerError } from '../types';
 
 export class CohereService {
-  private client: typeof cohere;
+  private client: CohereClientV2;
 
   constructor() {
-    this.client = cohere;
-    this.client.init(appConfig.cohere.apiKey);
+    this.client = new CohereClientV2({
+      token: appConfig.cohere.apiKey
+    });
   }
 
-  /**
-   * Generate embeddings for text using Cohere Embed v4
-   */
-  async generateEmbeddings(texts: string[]): Promise<number[][]> {
+  async generateEmbeddings(query: string): Promise<any> {
     try {
       const response = await this.client.embed({
-        texts,
+        texts: [query],
         model: appConfig.cohere.model,
+        inputType: 'search_query',
+        embeddingTypes: ['float'],
+        outputDimension: 1536
       });
 
-      if (!response.body.embeddings || response.body.embeddings.length === 0) {
-        throw new InternalServerError('No embeddings generated from Cohere');
+      if (!response.embeddings) {
+        throw new InternalServerError('No embeddings generated from Cohere for query');
       }
 
-      return response.body.embeddings;
+      return response.embeddings;
     } catch (error) {
       if (error instanceof AppError) {
         throw error;
       }
 
       console.error('Cohere embedding error:', error);
-      throw new InternalServerError('Failed to generate embeddings');
+      throw new InternalServerError('Failed to generate embeddings for query');
     }
   }
 
-  /**
-   * Generate embedding for a single text
-   */
-  async generateEmbedding(text: string): Promise<number[]> {
-    const embeddings = await this.generateEmbeddings([text]);
-    return embeddings[0]!;
-  }
-
-  /**
-   * Health check for Cohere service
-   */
-  async healthCheck(): Promise<boolean> {
+  async generateEmbeddingsFromUrl(image_url: string): Promise<any> {
     try {
-      // Test with a simple embedding
-      await this.generateEmbedding('test');
-      return true;
+      console.log('[CohereService] Fetching image:', image_url);
+      const image = await fetch(image_url);
+      const buffer = await image.arrayBuffer();
+      const stringifiedBuffer = Buffer.from(buffer).toString('base64');
+      const contentType = image.headers.get('content-type');
+      const imageBase64 = `data:${contentType};base64,${stringifiedBuffer}`;
+
+      const response = await this.client.embed({
+        images: [imageBase64],
+        model: appConfig.cohere.model,
+        inputType: 'image',
+        embeddingTypes: ['float'],
+        outputDimension: 1536
+      });
+
+      console.log('[CohereService] Cohere API response:', response);
+
+      if (!response.embeddings) {
+        throw new InternalServerError('No embeddings generated from Cohere');
+      }
+
+      // Return the full response in the required format
+      return {
+        id: response.id,
+        embeddings: {
+          float: response.embeddings
+        },
+        texts: response.texts,
+        meta: response.meta,
+      };
     } catch (error) {
-      console.error('Cohere health check failed:', error);
-      return false;
+      console.error('[CohereService] Cohere embedding error:', error);
+      throw new InternalServerError('Failed to generate image embeddings');
     }
   }
 }

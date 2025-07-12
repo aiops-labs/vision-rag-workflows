@@ -1,15 +1,15 @@
 import { Router } from 'express';
 import { searchController } from '../controllers/searchController';
-import { validateRequest } from '../middleware/validation';
+import { validateRequest, validateQuery } from '../middleware/validation';
 import { asyncHandler } from '../middleware/errorHandler';
-import { SearchRequestSchema } from '../types';
+// import { SearchRequestSchema } from '../types';
 import { z } from 'zod';
 
 const router = Router();
 
 // Schema for query parameter validation
 const SearchQuerySchema = z.object({
-  q: z.string().min(1, 'Query is required'),
+  query: z.string().min(1, 'Query is required'),
   namespace: z.string().min(1, 'Namespace is required'),
   topK: z.string().optional().transform((val) => val ? parseInt(val, 10) : 10),
 });
@@ -21,8 +21,8 @@ const SearchQuerySchema = z.object({
  */
 router.post(
   '/',
-  validateRequest(SearchRequestSchema),
-  asyncHandler(searchController.searchVectors.bind(searchController))
+  validateRequest(SearchQuerySchema),
+  asyncHandler(searchController.searchByBody.bind(searchController))
 );
 
 /**
@@ -32,7 +32,7 @@ router.post(
  */
 router.get(
   '/',
-  validateRequest(SearchQuerySchema),
+  validateQuery(SearchQuerySchema),
   asyncHandler(searchController.searchByQuery.bind(searchController))
 );
 
