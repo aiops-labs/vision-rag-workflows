@@ -1,15 +1,15 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "./dist",
-    "rootDir": "./src",
+    "outDir": "./lib",
+    "rootDir": "../..",
     "composite": true
   },
-  "include": ["./src/**/*.ts"],
-  "exclude": ["node_modules", "dist"],
+  "include": ["./**/*.ts"],
+  "exclude": ["node_modules", "lib"],
   "references": [
     {
       "path": "../temporal-workflows"
     }
   ]
-}
+} 

@@ -6,12 +6,13 @@ import dotenv from 'dotenv';
 import { embedRoutes } from './routes/embedRoutes';
 import { searchRoutes } from './routes/searchRoutes';
 import { errorHandler } from './middleware/errorHandler';
+import { appConfig } from './config';
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = appConfig.server.port || 3000;
 
 // Middleware
 app.use(helmet());

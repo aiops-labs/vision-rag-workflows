@@ -199,14 +199,14 @@ router.get('/status/:workflowId', asyncHandler(async (req: Request, res: Respons
   const { workflowId } = req.params;
 
   try {
-    const status = await temporalService.getWorkflowStatus(workflowId);
+    const status = await temporalService.getWorkflowStatus(workflowId!);
 
     res.json({
       success: true,
       data: {
         workflowId,
         status: status.status.name,
-        result: status.status.name === 'COMPLETED' ? await temporalService.getWorkflowResult(workflowId) : null
+        result: status.status.name === 'COMPLETED' ? await temporalService.getWorkflowResult(workflowId!) : null
       },
       message: 'Workflow status retrieved successfully',
     });

@@ -61,3 +61,11 @@ export interface WorkflowStatusResponse {
   status: string;
   result?: any;
 }
+
+// Error class for internal server errors
+export class InternalServerError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'InternalServerError';
+  }
+}
