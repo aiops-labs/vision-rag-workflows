@@ -8,7 +8,8 @@
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts"
   },
   "dependencies": {
-    "@vision-rag-api/temporal-workflows": "^1.0.0"
+    "@vision-rag-api/temporal-workflows": "^1.0.0",
+    "@temporalio/worker": "^1.11.8"
   },
   "devDependencies": {
     "ts-node-dev": "^2.0.0",

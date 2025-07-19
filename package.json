@@ -7,12 +7,15 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -b",
     "start": "node dist/index.js",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "test": "jest",
     "lint": "eslint src/**/*.ts",
-    "lint:fix": "eslint src/**/*.ts --fix"
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "start:api": "npm --workspace packages/express-api-new run start",
+    "start:worker": "npm --workspace packages/temporal-worker run start",
+    "start:all": "npm run start:api & npm run start:worker"
   },
   "keywords": [
     "express",

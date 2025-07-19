@@ -1,10 +1,10 @@
 {
     "name": "@vision-rag-api/temporal-workflows",
     "version": "1.0.0",
-    "main": "lib/index.js",
-    "types": "lib/index.d.ts",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
     "scripts": {
-        "build": "rm -rf lib && tsc --build",
+        "build": "rm -rf dist && tsc --build",
         "build.watch": "tsc --build -w --preserveWatchOutput",
         "lint": "eslint ."
     },

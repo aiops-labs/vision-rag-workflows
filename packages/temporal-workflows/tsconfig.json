@@ -1,8 +1,8 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "./lib",
-    "rootDir": "../..",
+    "outDir": "./dist",
+    "rootDir": "./src",
     "composite": true
   },
   "include": ["./**/*.ts", "../express-api-new/src/config/*.ts", "../express-api-new/src/*.ts"],
