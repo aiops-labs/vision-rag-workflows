@@ -4,7 +4,7 @@
     "module": "commonjs",
     "lib": ["ES2020"],
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": "packages",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -24,6 +24,6 @@
     "noPropertyAccessFromIndexSignature": true,
     "noUncheckedIndexedAccess": true
   },
-  "include": ["src/**/*"],
+  "include": ["**/*"],
   "exclude": ["node_modules", "dist", "**/*.test.ts"]
 } 
