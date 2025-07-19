@@ -1,7 +1,7 @@
 import { PineconeDbClient } from '../utils/pinecone';
 import { AICohereClientV2 } from '../utils/cohere';
-import { appConfig } from '../../../express-api/src/config';
-import { InternalServerError } from '../../../express-api/src/types';
+import { appConfig } from '../../../express-api-new/src/config';
+import { InternalServerError } from '../../../express-api-new/src/types';
 
 export interface SearchResult {
   id: string;
