@@ -1,0 +1,10 @@
+{
+    "name": "@vision-rag/shared-workflows",
+    "version": "1.0.0",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+      "build": "rm -rf dist && tsc -b"
+    }
+  }
+  

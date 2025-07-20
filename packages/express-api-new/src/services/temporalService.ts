@@ -1,4 +1,5 @@
 import { Client, WorkflowHandle } from '@temporalio/client';
+import { NativeConnection } from '@temporalio/worker';
 
 // Import workflow types
 export interface ImageEmbedWorkflowInput {
@@ -45,11 +46,13 @@ export class TemporalService {
 
   async getClient(): Promise<Client> {
     if (!this.client) {
+      const connection = await NativeConnection.connect({
+        address: 'localhost:7233',
+        // TLS and gRPC metadata configuration goes here.
+      });
       this.client = new Client({
-        connection: {
-          address: process.env.TEMPORAL_SERVER_URL || 'localhost:7233',
-        },
-        namespace: process.env.TEMPORAL_NAMESPACE || 'default',
+        connection: connection,
+        namespace: process.env['TEMPORAL_NAMESPACE'] || 'default',
       });
     }
     return this.client;

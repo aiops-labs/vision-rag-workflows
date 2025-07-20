@@ -1,17 +1,19 @@
-import { Worker } from '@temporalio/worker';
-import * as workflows from '@vision-rag/shared-workflows';
-
-console.log(workflows)
+import { Worker, NativeConnection } from '@temporalio/worker';
+import { greet } from '@vision-rag/shared-workflows';
+const TASK_QUEUE = 'vision-rag-queue';
 
 async function run() {
-  await Worker.create({
+  const connection = await NativeConnection.connect({ address: 'localhost:7233' });
+
+  const worker = await Worker.create({
+    connection,
+    activities: { greet },
     workflowsPath: require.resolve('@vision-rag/shared-workflows'),
-    taskQueue: 'vision-rag-api',
+    taskQueue: TASK_QUEUE,
     namespace: 'default',
   });
-}
 
-run().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+  console.log(`✅ Worker running on: ${TASK_QUEUE}`);
+  await worker.run();
+}
+run().catch(console.error);

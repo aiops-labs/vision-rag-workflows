@@ -58,7 +58,7 @@ router.post('/', asyncHandler(async (req: Request, res: Response) => {
           score: result.score,
           metadata: {
             ...result.metadata,
-            gcsUrl: result.gcsUrl
+            ...(result.gcsUrl && { gcsUrl: result.gcsUrl })
           }
         })),
         query: searchResult.query,
@@ -113,7 +113,7 @@ router.get('/', asyncHandler(async (req: Request, res: Response) => {
           score: result.score,
           metadata: {
             ...result.metadata,
-            gcsUrl: result.gcsUrl
+            ...(result.gcsUrl && { gcsUrl: result.gcsUrl })
           }
         })),
         query: searchResult.query,

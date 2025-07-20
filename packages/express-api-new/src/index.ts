@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 import { embedRoutes } from './routes/embedRoutes';
 import { searchRoutes } from './routes/searchRoutes';
+import { helloRoutes } from './routes/helloRoutes';
 import { errorHandler } from './middleware/errorHandler';
 import { appConfig } from './config';
 
@@ -22,7 +23,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Health check
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
   res.json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
@@ -33,12 +34,13 @@ app.get('/health', (req, res) => {
 // Routes
 app.use('/api/embed', embedRoutes);
 app.use('/api/search', searchRoutes);
+app.use('/api/hello', helloRoutes);
 
 // Error handling
 app.use(errorHandler);
 
 // 404 handler
-app.use('*', (req, res) => {
+app.use('*', (_req, res) => {
   res.status(404).json({
     success: false,
     error: 'Route not found'

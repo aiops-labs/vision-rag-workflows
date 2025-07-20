@@ -6,7 +6,7 @@ export class GCSService {
 
   constructor() {
     this.storage = new Storage();
-    this.bucketName = process.env.GCS_BUCKET_NAME || 'vision-rag-bucket';
+    this.bucketName = process.env['GCS_BUCKET_NAME'] || 'vision-rag-bucket';
   }
 
   async uploadBuffer(
