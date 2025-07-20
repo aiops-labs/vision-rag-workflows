@@ -1,2 +1,3 @@
 export * from './helloWorkflow';
-export * from './activities';
+export * from './imageEmbedWorkflow';
+export * from './searchEmbedWorkflow';

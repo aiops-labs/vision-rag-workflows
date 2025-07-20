@@ -1,7 +1,7 @@
 // @@@SNIPSTART typescript-hello-workflow
 import { proxyActivities } from '@temporalio/workflow';
 // Only import the activity types
-import type * as activities from './activities';
+import type * as activities from './activities/helloWorkflowActivities';
 
 const { greet } = proxyActivities<typeof activities>({
   startToCloseTimeout: '1 minute',
