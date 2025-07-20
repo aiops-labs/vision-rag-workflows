@@ -1,18 +1,20 @@
+// packages/worker/tsconfig.json
 {
-    "compilerOptions": {
-      "baseUrl": ".",
-      "paths": {
-        "@vision-rag/shared-workflows": ["../shared-workflows/dist"]
-      },
-      "esModuleInterop": true,
-      "moduleResolution": "node",
-      "module": "CommonJS",
-      "target": "ES2017",
-      "outDir": "dist",
-      "rootDir": "src",
-      "strict": true
+  "compilerOptions": {
+    "baseUrl": ".",                         // local base
+    "paths": {
+      "@vision-rag/shared-workflows/*": ["../shared-workflows/src/*"]  // source, not dist
     },
-    "include": ["src"],
-    
-  }
-  
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "module": "CommonJS",
+    "target": "ES2017",
+    "outDir": "dist",
+    "rootDir": "src",                       // 👈 only compile your worker's code
+    "strict": true,
+  },
+  "include": ["src"],
+  "references": [
+    { "path": "../shared-workflows" }      // 👈 TS project reference to the shared code
+  ],
+}

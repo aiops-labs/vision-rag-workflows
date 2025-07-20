@@ -23,7 +23,10 @@
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "noUncheckedIndexedAccess": true,
-    "composite": true
+    "composite": true,
+    "paths": {
+      "@vision-rag/shared-workflows": ["packages/shared-workflows/src/index.ts"]
+    }
   },
   "include": [
     "**/*.ts"

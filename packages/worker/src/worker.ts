@@ -1,5 +1,5 @@
 import { Worker, NativeConnection } from '@temporalio/worker';
-import { greet } from '@vision-rag/shared-workflows';
+import { searchSimilarVectors } from '../../shared-workflows/dist/activities/searchActivities';
 const TASK_QUEUE = 'vision-rag-queue';
 
 async function run() {
@@ -7,7 +7,7 @@ async function run() {
 
   const worker = await Worker.create({
     connection,
-    activities: { greet },
+    activities: { searchSimilarVectors },
     workflowsPath: require.resolve('@vision-rag/shared-workflows'),
     taskQueue: TASK_QUEUE,
     namespace: 'default',
@@ -16,4 +16,5 @@ async function run() {
   console.log(`✅ Worker running on: ${TASK_QUEUE}`);
   await worker.run();
 }
+
 run().catch(console.error);

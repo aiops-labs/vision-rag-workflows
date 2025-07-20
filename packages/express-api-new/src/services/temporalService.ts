@@ -1,5 +1,6 @@
 import { Client, WorkflowHandle } from '@temporalio/client';
 import { NativeConnection } from '@temporalio/worker';
+import { ImageEmbedWorkflow, SearchWorkflow } from '@vision-rag/shared-workflows';
 
 // Import workflow types
 export interface ImageEmbedWorkflowInput {
@@ -61,7 +62,7 @@ export class TemporalService {
   async startImageEmbedWorkflow(input: ImageEmbedWorkflowInput): Promise<WorkflowHandle> {
     const client = await this.getClient();
     
-    return client.workflow.start('ImageEmbedWorkflow', {
+    return client.workflow.start(ImageEmbedWorkflow, {
       args: [input],
       taskQueue: this.taskQueue,
       workflowId: `image-embed-${input.userId}-${input.orgId}-${Date.now()}`,
@@ -81,7 +82,7 @@ export class TemporalService {
   async startSearchWorkflow(input: SearchWorkflowInput): Promise<SearchWorkflowResult> {
     const client = await this.getClient();
     
-    const handle = await client.workflow.start('SearchWorkflow', {
+    const handle = await client.workflow.start(SearchWorkflow, {
       args: [input],
       taskQueue: this.taskQueue,
       workflowId: `search-${input.userId}-${input.orgId}-${Date.now()}`,
