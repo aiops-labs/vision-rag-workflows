@@ -3,7 +3,8 @@
     "version": "1.0.0",
     "main": "dist/index.js",
     "scripts": {
-        "build": "rm -rf dist && tsc -b",
+        "clean": "rm -rf dist tsconfig.tsbuildinfo",
+        "build": "npm run clean && tsc -b --force",
         "start": "node dist/worker.js"
     },
     "dependencies": {

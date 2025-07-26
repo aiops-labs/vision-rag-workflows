@@ -3,7 +3,7 @@ import { searchSimilarVectors } from '../../shared-workflows/dist/activities/sea
 const TASK_QUEUE = 'vision-rag-queue';
 
 async function run() {
-  const connection = await NativeConnection.connect({ address: 'localhost:7233' });
+  const connection = await NativeConnection.connect({ address: `${process.env['TEMPORAL_ADDRESS']}:7233` });
 
   const worker = await Worker.create({
     connection,

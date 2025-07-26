@@ -45,7 +45,7 @@ export class TemporalService {
   private client: Client | null = null;
   private readonly taskQueue = 'vision-rag-queue';
 
-  async getClient(): Promise<Client> {
+  async getClient(namespace?: string): Promise<Client> {
     if (!this.client) {
       const connection = await NativeConnection.connect({
         address: 'localhost:7233',
@@ -53,14 +53,14 @@ export class TemporalService {
       });
       this.client = new Client({
         connection: connection,
-        namespace: process.env['TEMPORAL_NAMESPACE'] || 'default',
+        namespace: namespace || 'default',
       });
     }
     return this.client;
   }
 
   async startImageEmbedWorkflow(input: ImageEmbedWorkflowInput): Promise<WorkflowHandle> {
-    const client = await this.getClient();
+    const client = await this.getClient(input.namespace);
     
     return client.workflow.start(ImageEmbedWorkflow, {
       args: [input],
