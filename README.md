@@ -4,7 +4,8 @@
 [![License](https://img.shields.io/badge/license-MIT-green)](#license)
 
 A streamlined Express.js API that integrates with Temporal workflows for image and PDF embedding, and vector search functionality.
-NOTE: This is an experiment repository and might need careful code walkthrough to be able to implement on production.
+
+#### NOTE: This is an experiment repository and might need careful code walkthrough to be able to implement on production.
 ---
 
 ## Table of Contents
