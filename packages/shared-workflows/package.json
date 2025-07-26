@@ -1,0 +1,11 @@
+{
+    "name": "@vision-rag/shared-workflows",
+    "version": "1.0.0",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+      "clean": "rm -rf dist tsconfig.tsbuildinfo",
+      "build": "npm run clean && tsc -b --force"
+    }
+  }
+  

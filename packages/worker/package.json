@@ -1,0 +1,23 @@
+{
+    "name": "@vision-rag-api/temporal-worker",
+    "version": "1.0.0",
+    "main": "dist/index.js",
+    "scripts": {
+        "clean": "rm -rf dist tsconfig.tsbuildinfo",
+        "build": "npm run clean && tsc -b --force",
+        "start": "node dist/worker.js"
+    },
+    "dependencies": {
+        "@temporalio/worker": "^1.11.8",
+        "@vision-rag/shared-workflows": "1.0.0",
+        "buffer": "^6.0.3",
+        "stream-browserify": "^3.0.0",
+        "ts-node": "^10.9.2",
+        "utils": "^0.3.1"
+    },
+    "devDependencies": {
+        "nodemon": "^3.1.7",
+        "ts-node-dev": "^2.0.0",
+        "typescript": "^5.3.2"
+    }
+}

@@ -1,0 +1,1 @@
+{"root":["./src/index.ts","./src/types.ts","./src/workflow.ts","./src/config/index.ts","./src/middleware/errorhandler.ts","./src/routes/embedroutes.ts","./src/routes/helloroutes.ts","./src/routes/searchroutes.ts","./src/services/gcsservice.ts","./src/services/temporalservice.ts"],"version":"5.8.3"}
