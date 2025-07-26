@@ -1,247 +1,132 @@
-# Vision RAG API
+# Express API with Temporal Workflows
 
-A modern Express.js API with TypeScript for text embedding and vector search using Cohere Embed v4 and Pinecone. Built with DRY principles, modular architecture, and best practices.
+[![npm version](https://img.shields.io/badge/npm-v1.0.0-blue)](https://www.npmjs.com/package/@vision-rag-api/express-api-new)
+[![License](https://img.shields.io/badge/license-MIT-green)](#license)
+
+A streamlined Express.js API that integrates with Temporal workflows for image and PDF embedding, and vector search functionality.
+
+---
+
+## Table of Contents
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+- [API Reference](#api-reference)
+- [Environment Variables](#environment-variables)
+- [Development](#development)
+- [Contributing](#contributing)
+- [License](#license)
+
+---
 
 ## Features
+- **Image Embedding**: Upload images via URL, store in GCS, embed with Temporal, and index in Pinecone.
+- **PDF Embedding**: Upload PDFs, convert pages to images, store in GCS, embed with Temporal, and index in Pinecone.
+- **Vector Search**: Query embeddings using Temporal workflows and retrieve similar vectors from Pinecone.
 
-- 🚀 **Express.js with TypeScript** - Modern, type-safe API development
-- 🔍 **Cohere Embed v4** - State-of-the-art text embeddings
-- 🌲 **Pinecone Vector Database** - High-performance vector search
-- ✅ **Zod Validation** - Runtime type safety and validation
-- 🛡️ **Security Middleware** - Helmet, CORS, rate limiting
-- 📊 **Health Checks** - Comprehensive service monitoring
-- 🏗️ **Modular Architecture** - Clean separation of concerns
-- 🧪 **Error Handling** - Robust error management
-- 📝 **API Documentation** - Clear endpoint documentation
+---
 
-## Quick Start
+## Installation
 
-### Prerequisites
-
-- Node.js 18+ 
-- npm or yarn
-- Cohere API key
-- Pinecone API key and index
-
-### Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd vision-rag-api
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Set up environment variables**
-   ```bash
-   cp env.example .env
-   ```
-   
-   Edit `.env` with your API keys:
-   ```env
-   PORT=3000
-   NODE_ENV=development
-   COHERE_API_KEY=your_cohere_api_key_here
-   PINECONE_API_KEY=your_pinecone_api_key_here
-   PINECONE_ENVIRONMENT=your_pinecone_environment_here
-   PINECONE_INDEX_NAME=your_index_name_here
-   ```
-
-4. **Start the development server**
-   ```bash
-   npm run dev
-   ```
-
-The API will be available at `http://localhost:3000`
-
-## API Endpoints
-
-### Health Check
-
-#### `GET /api/v1/health`
-Basic health check
 ```bash
-curl http://localhost:3000/api/v1/health
+npm install @vision-rag-api/express-api-new
 ```
 
-#### `GET /api/v1/health/detailed`
-Detailed health check with service status
+---
+
+## Usage
+
+```ts
+import express from 'express';
+import { embedRoutes } from '@vision-rag-api/express-api-new';
+
+const app = express();
+app.use('/api/embed', embedRoutes);
+// ... other routes and middleware
+app.listen(3000);
+```
+
+Or run the included server:
+
 ```bash
-curl http://localhost:3000/api/v1/health/detailed
+npm run dev # for development
+npm run build && npm start # for production
 ```
 
-### Embedding
+---
 
-#### `POST /api/v1/embed`
-Embed a single text and store in Pinecone
+## API Reference
 
-**Request Body:**
+### Embed Image
+`POST /api/embed/image`
 ```json
 {
-  "text": "Your text to embed",
-  "namespace": "your-namespace",
-  "metadata": {
-    "source": "document",
-    "category": "technical"
-  }
+  "imageUrl": "https://example.com/image.jpg",
+  "namespace": "my-namespace",
+  "userId": "user123",
+  "orgId": "org456"
 }
 ```
 
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "id": "uuid",
-    "namespace": "your-namespace",
-    "vector": [0.1, 0.2, ...],
-    "metadata": {
-      "text": "Your text to embed",
-      "source": "document",
-      "category": "technical",
-      "createdAt": "2024-01-01T00:00:00.000Z"
-    }
-  },
-  "message": "Text embedded and stored successfully"
-}
-```
-
-#### `POST /api/v1/embed/batch`
-Embed multiple texts in batch
-
-**Request Body:**
-```json
-{
-  "texts": ["Text 1", "Text 2", "Text 3"],
-  "namespace": "your-namespace",
-  "metadata": {
-    "source": "batch-upload"
-  }
-}
-```
+### Embed PDF
+`POST /api/embed/pdf` (multipart/form-data)
+- `pdf`: PDF file
+- `namespace`, `userId`, `orgId`: strings
 
 ### Search
-
-#### `POST /api/v1/search`
-Search for similar vectors using request body
-
-**Request Body:**
+`POST /api/search`
 ```json
 {
   "query": "search query",
-  "namespace": "your-namespace",
-  "topK": 10,
-  "filter": {
-    "category": "technical"
-  }
+  "namespace": "my-namespace",
+  "userId": "user123",
+  "orgId": "org456",
+  "topK": 5
 }
 ```
+Or
+`GET /api/search?query=...&namespace=...&userId=...&orgId=...&topK=5`
 
-#### `GET /api/v1/search?q=query&namespace=your-namespace&topK=10`
-Search using query parameters
+### Check Workflow Status
+`GET /api/embed/status/:workflowId`
 
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "results": [
-      {
-        "id": "uuid",
-        "score": 0.95,
-        "metadata": {
-          "text": "Original text",
-          "category": "technical"
-        }
-      }
-    ],
-    "query": "search query",
-    "namespace": "your-namespace",
-    "totalResults": 1
-  },
-  "message": "Found 1 similar results"
-}
-```
+---
 
-#### `GET /api/v1/search/stats`
-Get Pinecone index statistics
+## Environment Variables
+- `PORT`: Server port (default: 3000)
+- `GCS_BUCKET_NAME`: Google Cloud Storage bucket name
+- `GOOGLE_APPLICATION_CREDENTIALS`: Path to GCS service account JSON
+- `TEMPORAL_SERVER_URL`: Temporal server address (default: localhost:7233)
+- `TEMPORAL_NAMESPACE`: Temporal namespace (default: default)
 
-## Project Structure
-
-```
-src/
-├── config/           # Configuration management
-├── controllers/      # Business logic controllers
-├── middleware/       # Express middleware
-├── routes/          # API route definitions
-├── services/        # External service integrations
-├── types/           # TypeScript types and Zod schemas
-├── app.ts           # Express app setup
-└── index.ts         # Server entry point
-```
+---
 
 ## Development
 
-### Available Scripts
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+2. Set up environment variables:
+   ```bash
+   cp .env.example .env
+   # Edit .env with your configuration
+   ```
+3. Start the server:
+   ```bash
+   npm run dev
+   # or for production
+   npm run build && npm start
+   ```
 
-- `npm run dev` - Start development server with hot reload
-- `npm run build` - Build for production
-- `npm start` - Start production server
-- `npm test` - Run tests
-- `npm run lint` - Run ESLint
-- `npm run lint:fix` - Fix ESLint errors
-
-### Environment Variables
-
-| Variable | Description | Required | Default |
-|----------|-------------|----------|---------|
-| `PORT` | Server port | No | 3000 |
-| `NODE_ENV` | Environment | No | development |
-| `COHERE_API_KEY` | Cohere API key | Yes | - |
-| `PINECONE_API_KEY` | Pinecone API key | Yes | - |
-| `PINECONE_ENVIRONMENT` | Pinecone environment | Yes | - |
-| `PINECONE_INDEX_NAME` | Pinecone index name | Yes | - |
-| `RATE_LIMIT_WINDOW_MS` | Rate limit window | No | 900000 |
-| `RATE_LIMIT_MAX_REQUESTS` | Max requests per window | No | 100 |
-
-## Error Handling
-
-The API uses a centralized error handling system with custom error classes:
-
-- `ValidationError` (400) - Input validation errors
-- `NotFoundError` (404) - Resource not found
-- `InternalServerError` (500) - Server errors
-
-All errors return consistent JSON responses:
-
-```json
-{
-  "success": false,
-  "error": "Error message",
-  "details": "Additional error details (development only)"
-}
-```
-
-## Security Features
-
-- **Helmet** - Security headers
-- **CORS** - Cross-origin resource sharing
-- **Rate Limiting** - Request throttling
-- **Input Validation** - Zod schema validation
-- **Error Sanitization** - Safe error responses
+---
 
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+Contributions are welcome! Please see [CONTRIBUTING.md](../../CONTRIBUTING.md) for guidelines. If this file does not exist yet, please create one in the root directory.
+
+---
 
 ## License
 
-MIT License - see LICENSE file for details 
+This project is licensed under the MIT License. See [LICENSE](../../LICENSE) for details. If this file does not exist yet, please create one in the root directory.
